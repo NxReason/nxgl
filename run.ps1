@@ -6,9 +6,9 @@ mingw32-make
 
 if ($? ) {
   Write-Host "--- Launching App ---" -ForegroundColor Green
-  ./vsgl
+  ./nxgl
 } else {
-  Write-Host "--- Build Failed ---" -ForegoundColor Red
+  Write-Host "--- Build Failed ---" -ForegroundColor Red
 }
 
 cd ..

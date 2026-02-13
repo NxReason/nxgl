@@ -1,113 +1,67 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 
-const char* vertexShaderSource = "#version 330 core\n"
-  "layout (location = 0) in vec3 aPos;\n"
-  "uniform float xOffset;\n"
-  "uniform float yOffset;\n"
-  "void main()\n"
-  "{\n"
-  "   gl_Position = vec4(aPos.x + xOffset, aPos.y + yOffset, aPos.z, 1.0);\n"
-  "}\0";
-
-// Fragment Shader source code
-const char* fragmentShaderSource = "#version 330 core\n"
-  "out vec4 FragColor;\n"
-  "void main()\n"
-  "{\n"
-  "   FragColor = vec4(0.4f, 0.25f, 0.65f, 1.0f);\n" // Orange color
-  "}\n\0";
+#include "nxgl/Window.h"
+#include "nxgl/Shader.h"
+#include "nxgl/UI.h"
+#include "nxgl/Geometry.h"
+#include "nxgl/VAO.h"
+#include "nxgl/VBO.h"
 
 float xOffset = 0.0f;
 float yOffset = 0.0f;
 void processInput(GLFWwindow* window);
 
 int main() {
-  if (!glfwInit()) {
-    std::cerr << "Failed to initialize GLFW" << std::endl;
-    return -1;
-  }
-
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  GLFWwindow* window = glfwCreateWindow(800, 600, "GLFW + Cmake + G++", nullptr, nullptr);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
-
-  glfwMakeContextCurrent(window);
-
-  // GLAD
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cout << "Failed to init GLAD" << std::endl;
-    return -1;
-  }
+  Window wnd("NXGL");
 
   // build and compile shaders
-  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-  glCompileShader(vertexShader);
-
-  unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-  glCompileShader(fragmentShader);
-
-  unsigned int shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  Shader vs("assets/shaders/shader.vert", GL_VERTEX_SHADER);
+  Shader fs("assets/shaders/shader.frag", GL_FRAGMENT_SHADER);
+  ShaderProgram program(vs.getId(), fs.getId());
+  vs.clear();
+  fs.clear();
 
   // vertex data
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f, // left
-     0.5f, -0.5f, 0.0f, // right
-     0.0f,  0.5f, 0.0f, // top
-  };
-  
-  unsigned int VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  
-  glBindVertexArray(VAO);
+  Geometry geo("triangle.geo");
+  VAO vao;
+  VBO vbo;
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  auto size = geo.getValues().size() * sizeof(float);
+  vbo.loadData(geo.getValues().data(), size);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
+  vao.defineAttrib();
 
-  while (!glfwWindowShouldClose(window)) {
-    processInput(window);
+  // IMGUI
+  UI ui(wnd.getWindow());
+
+  while (wnd.isRunning()) {
+    processInput(wnd.getWindow());
+
+    ui.render();
 
     // render
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT);
     
     // triangle
-    glUseProgram(shaderProgram);
+    program.use();
 
-    int xLoc = glGetUniformLocation(shaderProgram, "xOffset");
-    int yLoc = glGetUniformLocation(shaderProgram, "yOffset");
+    int xLoc = glGetUniformLocation(program.getId(), "xOffset");
+    int yLoc = glGetUniformLocation(program.getId(), "yOffset");
     glUniform1f(xLoc, xOffset);
     glUniform1f(yLoc, yOffset);
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    vao.use();
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    ui.drawData();
+    wnd.refresh();
   }
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shaderProgram);
+  ui.clear();
+  vao.clear();
+  vbo.clear();
+  program.clear();
 
   glfwTerminate();
   return 0;
