@@ -1,6 +1,8 @@
 #include "nxgl/Window.h"
 #include <iostream>
 
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
 Window::Window(const char* appName) {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -21,6 +23,8 @@ Window::Window(const char* appName) {
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cerr << "Failed to init GLAD" << std::endl;
   }
+
+  glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 }
 
 
@@ -35,4 +39,8 @@ bool Window::isRunning() const {
 void Window::refresh() {
   glfwSwapBuffers(window);
   glfwPollEvents();
+}
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
 }

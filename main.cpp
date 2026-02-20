@@ -6,82 +6,66 @@
 #include "nxgl/Geometry.h"
 #include "nxgl/VAO.h"
 #include "nxgl/VBO.h"
+#include "nxgl/EBO.h"
 
-float xOffset = 0.0f;
-float yOffset = 0.0f;
 void processInput(GLFWwindow* window);
+
+std::pair<ShaderProgram, VAO> drawTriangle();
+std::pair<ShaderProgram, VAO> makeRainbowTriangle();
 
 int main() {
   Window wnd("NXGL");
 
-  // build and compile shaders
-  Shader vs("assets/shaders/shader.vert", GL_VERTEX_SHADER);
-  Shader fs("assets/shaders/shader.frag", GL_FRAGMENT_SHADER);
-  ShaderProgram program(vs.getId(), fs.getId());
-  vs.clear();
-  fs.clear();
-
-  // vertex data
-  Geometry geo("triangle.geo");
-  VAO vao;
-  VBO vbo;
-
-  auto size = geo.getValues().size() * sizeof(float);
-  vbo.loadData(geo.getValues().data(), size);
-
-  vao.defineAttrib();
-
+  auto triangle = makeRainbowTriangle();
   // IMGUI
   UI ui(wnd.getWindow());
 
   while (wnd.isRunning()) {
-    processInput(wnd.getWindow());
-
-    ui.render();
-
     // render
+    processInput(wnd.getWindow());
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    // triangle
-    program.use();
 
-    int xLoc = glGetUniformLocation(program.getId(), "xOffset");
-    int yLoc = glGetUniformLocation(program.getId(), "yOffset");
-    glUniform1f(xLoc, xOffset);
-    glUniform1f(yLoc, yOffset);
-
-    vao.use();
+    triangle.first.use();
+    triangle.second.bind();
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    triangle.second.unbind();
 
-    ui.drawData();
     wnd.refresh();
   }
-
-  ui.clear();
-  vao.clear();
-  vbo.clear();
-  program.clear();
-
   glfwTerminate();
   return 0;
 }
 
 void processInput(GLFWwindow* window) {
-  float speed = 0.01f;
-
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+}
 
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    xOffset -= speed;
+std::pair<ShaderProgram, VAO> drawTriangle() {
+  Geometry triangleGeo("triangle.geo");
+  VAO vao;
+  VBO vbo{ triangleGeo.getValues() };
+  Shader vertex{"assets/shaders/shader.vert", GL_VERTEX_SHADER};
+  Shader frag{"assets/shaders/shader.frag", GL_FRAGMENT_SHADER};
+  ShaderProgram program { vertex.getId(), frag.getId() };
+  vao.setStride(3 * sizeof(float));
+  vao.attr<float>(3);
 
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    xOffset += speed;
+  return std::pair{program, vao};
+}
 
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    yOffset += speed;
+std::pair<ShaderProgram, VAO> makeRainbowTriangle() {
+  Geometry triangleGeo("rainbowtriangle.geo");
+  VAO vao;
+  VBO vbo{ triangleGeo.getValues() };
+  Shader vertex{"assets/shaders/poscol.vert", GL_VERTEX_SHADER};
+  Shader frag{"assets/shaders/poscol.frag", GL_FRAGMENT_SHADER};
+  ShaderProgram program { vertex.getId(), frag.getId() };
+  program.use();
+  vao.setStride(6 * sizeof(float));
+  vao.attr<float>(3);
+  vao.attr<float>(3);
 
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    yOffset -= speed;
+  return std::pair{program, vao};
 }

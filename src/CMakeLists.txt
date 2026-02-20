@@ -6,4 +6,6 @@ target_sources(nxgl PRIVATE
   Geometry.cpp
   VAO.cpp
   VBO.cpp
+  EBO.cpp
+  Texture.cpp
 )

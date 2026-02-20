@@ -6,13 +6,12 @@ VAO::VAO() {
   glBindVertexArray(id);
 }
 
-void VAO::defineAttrib() {
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
+void VAO::bind() {
+  glBindVertexArray(id);
 }
 
-void VAO::use() {
-  glBindVertexArray(id);
+void VAO::unbind() {
+  glBindVertexArray(0);
 }
 
 void VAO::clear() {

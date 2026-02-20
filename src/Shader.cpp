@@ -4,6 +4,8 @@
 #include <string>
 #include <sstream>
 
+const std::string PATH_PREFIX = "assets/shaders/";
+
 Shader::Shader(const char* path, GLenum shaderType) {
   std::ifstream file(path);
   if (!file.is_open()) {
@@ -18,6 +20,14 @@ Shader::Shader(const char* path, GLenum shaderType) {
   id = glCreateShader(shaderType);
   glShaderSource(id, 1, &shaderCstr, nullptr);
   glCompileShader(id);
+
+  int success;
+  char infoLog[512];
+  glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(id, 512, nullptr, infoLog);
+    std::cerr << "Error compiling shader: " << infoLog << std::endl;
+  }
 
   file.close();
 }
