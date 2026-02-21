@@ -53,11 +53,6 @@ int ShaderProgram::getUniformLocation(const std::string& name) {
   uniformLocationCache[name] = location;
   return location;
 }
-void ShaderProgram::setVec3(const std::string& name, Vec3 vec) {
-  bind();
-  int location = getUniformLocation(name);
-  glUniform3f(location, vec.x, vec.y, vec.z);
-}
 
 void ShaderProgram::setFloat(const std::string& name, float value) {
   bind();
@@ -69,6 +64,18 @@ void ShaderProgram::setInt(const std::string &name, int value) {
   bind();
   int location = getUniformLocation(name);
   glUniform1i(location, value);
+}
+
+void ShaderProgram::setVec3(const std::string& name, Vec3 vec) {
+  bind();
+  int location = getUniformLocation(name);
+  glUniform3f(location, vec.x, vec.y, vec.z);
+}
+
+void ShaderProgram::setMat4(const std::string& name, Mat4 mat) {
+  bind();
+  int location = getUniformLocation(name);
+  glUniformMatrix4fv(location, 1, GL_FALSE, &mat.elements[0]);
 }
 
 ShaderProgram::~ShaderProgram() {

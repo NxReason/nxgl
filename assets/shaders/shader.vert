@@ -4,10 +4,11 @@ layout (location = 1) in vec2 aTex;
 
 out vec2 TexCoord;
 
-uniform float uOffsetX;
+uniform mat4 proj;
+uniform mat4 model;
 
 void main()
 {
   TexCoord = aTex;
-  gl_Position = vec4(aPos.x + uOffsetX, aPos.yz, 1.0);
+  gl_Position = proj * model * vec4(aPos, 1.0);
 }

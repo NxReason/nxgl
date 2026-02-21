@@ -4,10 +4,10 @@ Rectangle::Rectangle(Vec3 o, Vec3 d) {
   vao.bind();
   float vertexData[] = {
     // pos          // tex
-    o.x, o.y, 0.0f, 0.0f, 1.0f,
-    o.x, d.y, 0.0f, 0.0f, 0.0f,
-    d.x, o.y, 0.0f, 1.0f, 1.0f,
-    d.x, d.y, 0.0f, 1.0f, 0.0f,
+    o.x, o.y, 0.0f, 0.0f, 0.0f,
+    o.x, d.y, 0.0f, 0.0f, 1.0f,
+    d.x, o.y, 0.0f, 1.0f, 0.0f,
+    d.x, d.y, 0.0f, 1.0f, 1.0f,
   };
   vbo.load(vertexData, 20);
 

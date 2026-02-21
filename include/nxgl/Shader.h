@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 
 #include "nxgl/math/Vec3.hpp"
+#include "nxgl/math/Mat4.hpp"
 
 class ShaderProgram {
 private:
@@ -25,6 +26,7 @@ public:
   void setFloat(const std::string& name, float value);
   void setInt(const std::string& name, int value);
   void setVec3(const std::string& name, Vec3 vec);
+  void setMat4(const std::string& name, Mat4 mat);
 };
 
 class Shader {

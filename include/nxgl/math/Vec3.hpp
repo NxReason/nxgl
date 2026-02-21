@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <iostream>
 
 class Vec3 {
 public:
@@ -26,3 +27,7 @@ inline Vec3 operator-(const Vec3& a, const Vec3& b) { return { a.x - b.x, a.y - 
 inline Vec3 operator*(const Vec3& v, float s) { return { v.x * s, v.y * s, v.z * s }; }
 inline Vec3 operator*(float s, const Vec3& v) { return v * s; }
 
+inline std::ostream& operator<<(std::ostream& os, const Vec3& v) {
+  os << "Vec3(" << v.x << ", " << v.y << ", " << v.z << ")";
+  return os;
+}

@@ -1,3 +1,4 @@
+#pragma once
 #include "nxgl/math/Vec3.hpp"
 
 namespace math {
