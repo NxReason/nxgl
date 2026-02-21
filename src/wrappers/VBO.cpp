@@ -3,7 +3,6 @@
 
 VBO::VBO() {
   glGenBuffers(1, &id);
-  glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
 VBO::VBO(std::vector<float> data) {
@@ -13,15 +12,17 @@ VBO::VBO(std::vector<float> data) {
 }
 
 void VBO::load(std::vector<float> data) {
+  bind();
   auto size = data.size() * sizeof(float);
   glBufferData(GL_ARRAY_BUFFER, size, data.data(), GL_STATIC_DRAW);
 }
 
-void VBO::load(float* data, long size) {
-  glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+void VBO::load(float* data, unsigned int size) {
+  bind();
+  glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), data, GL_STATIC_DRAW);
 }
 
-void VBO::use() {
+void VBO::bind() const {
   glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 

@@ -1,11 +1,18 @@
 target_sources(nxgl PRIVATE
-  Shader.cpp
-  ShaderProgram.cpp
   Window.cpp
   UI.cpp
   Geometry.cpp
-  VAO.cpp
-  VBO.cpp
-  EBO.cpp
-  Texture.cpp
+  ImageData.cpp
+  Renderer.cpp
+
+  wrappers/Shader.cpp
+  wrappers/ShaderProgram.cpp
+  wrappers/VAO.cpp
+  wrappers/VBO.cpp
+  wrappers/EBO.cpp
+  wrappers/Texture.cpp
+
+  shapes/Triangle.cpp
+  shapes/Rectangle.cpp
+  shapes/Circle.cpp
 )

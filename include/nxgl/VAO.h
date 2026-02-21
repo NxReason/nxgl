@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <glad/glad.h>
+#include "nxgl/VBO.h"
+#include "nxgl/VertexLayout.hpp"
 
 class VAO {
 private:
@@ -10,20 +12,9 @@ private:
   GLsizei attrStride = 0;
 public:
   VAO();
-  void setStride(GLsizei stride) { attrStride = stride; }
-  template<typename T>
-  void attr(int size);
+
+  void addBuffer(const VBO& vbo, const VertexLayout& layout);
   void bind();
   void unbind();
   void clear();
 };
-
-template<>
-inline void VAO::attr<float>(GLint size) {
-  std::cout << size << ", " << attrPos << ", " << attrOffset << ", " << attrStride << std::endl;
-  glVertexAttribPointer(attrPos, size, GL_FLOAT, GL_FALSE, attrStride, (void*)(attrOffset * sizeof(float)));
-  glEnableVertexAttribArray(attrPos);
-
-  attrPos += 1;
-  attrOffset += (GLintptr)size;
-}

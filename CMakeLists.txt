@@ -4,9 +4,10 @@ project(NXGL)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(GLFW_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glfw")
-set(GLAD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/glad")
-set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
+set(GLFW_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/glfw")
+set(GLAD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/glad")
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui")
+set(STBI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/stbi")
 
 set(IMGUI_SOURCES
   ${IMGUI_DIR}/imgui.cpp
@@ -20,6 +21,7 @@ set(IMGUI_SOURCES
 add_executable(nxgl
   main.cpp
   "${GLAD_DIR}/src/glad.c"
+  "${STBI_DIR}/stbi_image.cpp"
   ${IMGUI_SOURCES})
 
 add_subdirectory(src)
@@ -29,6 +31,7 @@ target_include_directories(nxgl PRIVATE
   "${GLFW_DIR}/include"
   "${GLAD_DIR}/include"
   "${IMGUI_DIR}/"
+  "${STBI_DIR}/"
 )
 
 target_link_libraries(nxgl PRIVATE

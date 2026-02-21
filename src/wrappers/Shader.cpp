@@ -36,6 +36,6 @@ unsigned int Shader::getId() const {
   return id;
 }
 
-void Shader::clear() {
+Shader::~Shader() {
   glDeleteShader(id);
 }

@@ -1,71 +1,54 @@
 #include <iostream>
+#include <memory>
 
 #include "nxgl/Window.h"
-#include "nxgl/Shader.h"
 #include "nxgl/UI.h"
-#include "nxgl/Geometry.h"
-#include "nxgl/VAO.h"
-#include "nxgl/VBO.h"
-#include "nxgl/EBO.h"
+
+#include "nxgl/math/Vec3.hpp"
+#include "nxgl/math/ops.hpp"
+
+#include "nxgl/Renderer.h"
+#include "nxgl/shapes/Triangle.hpp"
+#include "nxgl/shapes/Rectangle.hpp"
+#include "nxgl/shapes/Circle.hpp"
 
 void processInput(GLFWwindow* window);
-
-std::pair<ShaderProgram, VAO> drawTriangle();
-std::pair<ShaderProgram, VAO> makeRainbowTriangle();
 
 int main() {
   Window wnd("NXGL");
 
-  auto triangle = makeRainbowTriangle();
+  auto rect = std::make_unique<Rectangle>( Vec3{ -0.5f, 0.5f }, Vec3{ 0.2f, -0.2f } );
+  auto triangle = std::make_unique<Triangle>(
+    Vec3{ -0.5f, -0.5f },
+    Vec3{ 0.0f, -0.5f },
+    Vec3{ -0.25f, 0.0f} 
+  );
+  auto circle = std::make_unique<Circle>( Vec3{ 0.0f, 0.0f }, 0.5f );
+  Renderer renderer;
+  // renderer.addShape(std::move(rect));
+  // renderer.addShape(std::move(triangle));
+  renderer.addShape(std::move(circle));
+
   // IMGUI
   UI ui(wnd.getWindow());
 
-  while (wnd.isRunning()) {
-    // render
-    processInput(wnd.getWindow());
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+  renderer.preset();
 
-    triangle.first.use();
-    triangle.second.bind();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    triangle.second.unbind();
+  const Vec3 v { 3.0, 4.0 };
+  std::cout << math::length(v) << std::endl;
+
+  while (wnd.isRunning()) {
+    processInput(wnd.getWindow());
+
+    renderer.render();
 
     wnd.refresh();
   }
-  glfwTerminate();
+  Window::terminate();
   return 0;
 }
 
 void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-}
-
-std::pair<ShaderProgram, VAO> drawTriangle() {
-  Geometry triangleGeo("triangle.geo");
-  VAO vao;
-  VBO vbo{ triangleGeo.getValues() };
-  Shader vertex{"assets/shaders/shader.vert", GL_VERTEX_SHADER};
-  Shader frag{"assets/shaders/shader.frag", GL_FRAGMENT_SHADER};
-  ShaderProgram program { vertex.getId(), frag.getId() };
-  vao.setStride(3 * sizeof(float));
-  vao.attr<float>(3);
-
-  return std::pair{program, vao};
-}
-
-std::pair<ShaderProgram, VAO> makeRainbowTriangle() {
-  Geometry triangleGeo("rainbowtriangle.geo");
-  VAO vao;
-  VBO vbo{ triangleGeo.getValues() };
-  Shader vertex{"assets/shaders/poscol.vert", GL_VERTEX_SHADER};
-  Shader frag{"assets/shaders/poscol.frag", GL_FRAGMENT_SHADER};
-  ShaderProgram program { vertex.getId(), frag.getId() };
-  program.use();
-  vao.setStride(6 * sizeof(float));
-  vao.attr<float>(3);
-  vao.attr<float>(3);
-
-  return std::pair{program, vao};
 }
